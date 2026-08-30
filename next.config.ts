@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
+  // Optional React Compiler workers cannot run in every CI/container environment.
+  reactCompiler: false,
 };
 
 export default nextConfig;
