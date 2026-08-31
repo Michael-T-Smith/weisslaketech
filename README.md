@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# weisslaketech — production frontend (V1)
 
-## Getting Started
+Purpose
+-------
+A focused, production-ready frontend for a veteran‑owned technology services business based in Collinsville, Alabama. This repository implements a fast, accessible, mobile‑first marketing site and guided service‑request UX built with the Next.js App Router and Tailwind CSS. It is intended to be deployed via Vercel CI/CD.
 
-First, run the development server:
+Design & product constraints
+---------------------------
+- Single‑session V1: frontend only. No backend, no AI, no external map SDKs.
+- Server Components by default; minimal client JS only where interaction requires it.
+- Centralized content and data under `src/lib/`.
+- Visual identity uses restrained brand accents (electric blue, violet, cyan) and neutral surfaces; design targets clarity and editorial spacing.
+- Routes implemented: `/`, `/services`, `/area`, `/faq`, `/contact`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Stack / Runtime
+---------------
+- Next.js 16 (App Router)
+- React 19 + TypeScript
+- Tailwind CSS 4
+- Minimal runtime JS; prefer SVG and CSS for visual devices
+
+Developer notes — locations
+---------------------------
+- Global styles: [src/app/globals.css](src/app/globals.css)
+- Centralized content/data: [src/lib/](src/lib/)
+- Homepage components: [src/components/home](src/components/home)
+- Contact flow components: [src/components/contact](src/components/contact)
+- Capability artwork SVGs / media: public/media/
+- Logo (expected): public/logo.svg
+- Favicon: public/favicon.ico
+
+Data contracts
+--------------
+Primary frontend contract for service intake (typed):
+
+```ts
+export interface ServiceRequest {
+	customerType: 'residential' | 'business';
+	serviceCategory:
+		| 'computer' | 'hardware' | 'data' | 'network' | 'smart-device' | 'business-software' | 'automation-integration' | 'unsure';
+	deliveryPreference: 'remote' | 'onsite' | 'unsure';
+	name: string;
+	email: string;
+	phone?: string;
+	preferredContactMethod: 'email' | 'phone' | 'text';
+	businessName?: string;
+	city: string;
+	zip: string;
+	description: string;
+	deviceType?: string;
+	affectedDeviceCount?: number;
+	preferredSchedule?: string;
+}
+
+export function submitServiceRequest(payload: ServiceRequest) {
+	// frontend boundary: mock / dev placeholder.
+	// Replace with integration hook (API route or external form endpoint) later.
+	return Promise.resolve({ ok: true, id: 'dev-placeholder' });
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Operational & CI
+----------------
+- Local dev:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Quality gate (run before deploy):
 
-## Learn More
+```bash
+npm run lint      # biome
+npx tsc --noEmit  # type check
+npm run build     # production build
+```
 
-To learn more about Next.js, take a look at the following resources:
+Accessibility & performance
+---------------------------
+- Semantic HTML, visible focus states, reduced‑motion support, keyboard navigation.
+- Keep hero media abstracted (GIF → WebM/MP4) and provide poster/fallback to minimize runtime cost.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Placeholders & required values
+------------------------------
+- BUSINESS_NAME — insert official business name in src/lib/business.ts
+- PHONE_NUMBER — insert contact phone where indicated
+- EMAIL_ADDRESS — insert contact email where indicated
+- public/media/hero.* — add production hero media (GIF/WebM/MP4) and poster images
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Operational reminders
+---------------------
+- Do not add pricing pages or detailed price tables; expose only minimal starting hints where appropriate.
+- Keep all private data and credentials out of the repo and environment; use Vercel environment variables for secrets.
+- The frontend must not implement scheduling, payments, or personal data storage without an explicit backend contract.
 
-## Deploy on Vercel
+Contributing
+------------
+- Follow component patterns in `src/components/` and centralized data in `src/lib/`.
+- Prefer server components; mark client components with 'use client' only when necessary.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Contact & deployment
+--------------------
+- This project is Vercel‑ready. Push to GitHub and link the repository in Vercel to enable CI/CD. Use the production environment to populate any runtime environment variables required by future integrations.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+License
+-------
+Proprietary — internal project for business use.

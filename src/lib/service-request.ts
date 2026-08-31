@@ -6,7 +6,8 @@ import type {
 } from "@/types/service-request";
 
 export interface ServiceRequestSubmissionResult {
-  status: "mock-accepted";
+  status: "rejected" | "accepted",
+  message: string
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -153,10 +154,21 @@ export function prepareServiceRequest(
 }
 
 /** Future backend integrations should replace only this function. */
-export async function submitServiceRequest(
-  payload: ServiceRequest,
-): Promise<ServiceRequestSubmissionResult> {
-  void payload;
-  await new Promise((resolve) => setTimeout(resolve, 650));
-  return { status: "mock-accepted" };
+export async function submitServiceRequest(payload: ServiceRequest): Promise<ServiceRequestSubmissionResult> { 
+
+  let result = await fetch("/api/leads", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!result.ok) {
+    return { status: "rejected", message: `Not your fault, server error occured: Status: ${result.status}`};
+  } 
+  
+  let response = await result.json()
+  
+  return response;
 }

@@ -27,7 +27,7 @@ const INITIAL_REQUEST: ServiceRequestDraft = {
 
 const VALIDATION_STEPS = [1, 2, 3, 4, 5] as const;
 
-type SubmissionStatus = "idle" | "submitting" | "error" | "success";
+type SubmissionStatus = "idle" | "submitting" | "error" | "success" | "rejected";
 
 export function ServiceRequestForm() {
   const [request, setRequest] = useState<ServiceRequestDraft>(INITIAL_REQUEST);
@@ -41,6 +41,7 @@ export function ServiceRequestForm() {
   const panelRef = useRef<HTMLDivElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | null>(null);
+  let [message, setMessage] = useState("");
 
   useEffect(() => {
     return () => {
@@ -178,10 +179,16 @@ export function ServiceRequestForm() {
 
     try {
       const payload = prepareServiceRequest(request);
-      await submitServiceRequest(payload);
-      setSubmissionStatus("success");
+      let response = await submitServiceRequest(payload); 
+      setMessage(response.message);
+      if (response.status == 'accepted') {
+        setSubmissionStatus("success");
+      } else {
+        setSubmissionStatus("rejected");
+      }
     } catch {
       setSubmissionStatus("error");
+      setMessage("Server Error, no details at this time.");
     }
   }
 
@@ -221,11 +228,59 @@ export function ServiceRequestForm() {
           Request received.
         </h2>
         <p className="mt-5 max-w-xl text-base leading-7 text-[#C8CBD2] sm:text-lg">
-          I’ll review the details and confirm the appropriate next step and
-          availability.
+          {message}
         </p>
         <p className="mt-8 border-l border-[#7D03F7] pl-4 text-sm leading-6 text-[#A5AAB5]">
           Submitting a request does not automatically confirm an appointment.
+        </p>
+      </div>
+    );
+  }
+
+    if (submissionStatus === "rejected") {
+    return (
+      <div
+        aria-live="polite"
+        className="min-h-[32rem] px-5 py-14 sm:px-10 sm:py-16"
+        ref={successRef}
+        tabIndex={-1}
+      >
+        <div
+          aria-hidden="true"
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-[#ff1744]/50 bg-[#03F7F7]/[0.06] text-[#03F7F7]"
+        >
+        <svg
+          fill="none"
+          height="22"
+          viewBox="0 0 24 24"
+          width="22"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            color: "#ff1744",
+            filter: "drop-shadow(0 0 4px #ff1744)",
+          }}
+        >
+          <title>Application Rejected</title>
+          <path
+            d="M6 6L18 18M18 6L6 18"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+          />
+        </svg>
+        </div>
+        <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] text-[#ff1744]">
+          Service request
+        </p>
+        <h2 className="mt-3 text-3xl font-medium tracking-[-0.04em] text-[#F7F8FA] sm:text-5xl">
+          We are sorry to say your  request has been rejected.
+        </h2>
+        <p className="mt-5 max-w-xl text-base leading-7 text-[#C8CBD2] sm:text-lg">
+          Request Rejected: {message}
+        </p>
+        <p className="mt-8 border-l border-[#7D03F7] pl-4 text-sm leading-6 text-[#A5AAB5]">
+          You may retry submitting a request, if all else fails, contact customer support.
         </p>
       </div>
     );
