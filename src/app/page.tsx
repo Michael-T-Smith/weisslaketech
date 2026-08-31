@@ -5,6 +5,7 @@ import { Hero } from "@/components/home/Hero";
 import { ServiceAreaPreview } from "@/components/home/ServiceAreaPreview";
 import { VeteranOwned } from "@/components/home/VeteranOwned";
 import { business } from "@/lib/business";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "Technology Support, Business IT & Software Solutions",
@@ -42,6 +43,7 @@ export default function HomePage() {
       <ServiceAreaPreview />
       <CapabilityShowcase />
       <FinalCTA />
+      <Analytics />
     </main>
   );
 }
